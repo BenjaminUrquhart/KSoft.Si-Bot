@@ -81,8 +81,12 @@ public class ImgGen extends Command {
 			InputStream image = conn.getInputStream();
 			String extension = conn.getHeaderField("Content-Type");
 			extension = "." + extension.split(";")[0].split("/")[1];
-			channel.sendFile(image, endpoint + extension).queue();
-			image.close();
+			channel.sendFile(image, endpoint + extension).queue((m) -> {
+				try {
+					image.close();
+				}
+				catch (IOException e) {}
+			});
 		}
 		catch(IndexOutOfBoundsException e){
 			channel.sendMessage(this.getHelpMenu()).queue();
