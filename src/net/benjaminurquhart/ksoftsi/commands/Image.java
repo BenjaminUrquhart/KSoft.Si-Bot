@@ -1,8 +1,7 @@
 package net.benjaminurquhart.ksoftsi.commands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.benjaminurquhart.ksoftsi.KSoftSi;
 import net.benjaminurquhart.ksoftsi.util.EmbedUtils;
@@ -11,7 +10,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.explodingbush.ksoftapi.KSoftAPI;
 import net.explodingbush.ksoftapi.entities.TaggedImage;
-import net.explodingbush.ksoftapi.enums.ImageTag;
+import net.explodingbush.ksoftapi.image.ImageTag;
 
 public class Image extends Command{
 	
@@ -29,9 +28,6 @@ public class Image extends Command{
 		}
 		try{
 			ImageTag tag = ImageTag.valueOf(args[2].toUpperCase());
-			if(tag.equals(ImageTag.LEWD) || args[2].toLowerCase().contains("lewd")){
-				throw new IllegalArgumentException("Blacklisted");
-			}
 			if(!channel.isNSFW() && tag.isNSFW()){
 				channel.sendMessage("That tag cannot be used outside of an NSFW channel!").queue();
 				return;
@@ -42,9 +38,8 @@ public class Image extends Command{
 			channel.sendMessage(eb.build()).queue();
 		}
 		catch(IllegalArgumentException e){
-			List<ImageTag> tags = new ArrayList<>(Arrays.asList(ImageTag.values()));
-			tags.remove(ImageTag.LEWD);
-			channel.sendMessage("Unknown tag `" + args[2] + "`.\nValid tags: " + (tags.toString().replace("[", "").replace("]", "").toLowerCase().replace("lewd, ", ""))).queue();
+			List<ImageTag> tags = ImageTag.getTags();
+			channel.sendMessage("Unknown tag `" + args[2] + "`.\nValid tags: " + tags.stream().map(tag -> tag.toString()).collect(Collectors.joining(", "))).queue();
 		}
 		catch(Exception e){
 			channel.sendMessage(e.toString()).queue();

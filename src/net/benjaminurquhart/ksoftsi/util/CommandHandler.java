@@ -2,6 +2,8 @@ package net.benjaminurquhart.ksoftsi.util;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import org.reflections.Reflections;
@@ -17,6 +19,8 @@ public class CommandHandler extends ListenerAdapter{
 	private KSoftSi self;
 	private HashMap<String, Command> commands;
 	
+	private ExecutorService executor;
+	
 	public CommandHandler(KSoftSi self){
 		this.self = self;
 		this.commands = new HashMap<>();
@@ -29,6 +33,7 @@ public class CommandHandler extends ListenerAdapter{
 				e.printStackTrace();
 			}
 		});
+		executor = Executors.newFixedThreadPool(10);
 	}
 	public void registerCommand(Command command){
 		commands.put(command.getName(), command);
@@ -55,32 +60,33 @@ public class CommandHandler extends ListenerAdapter{
 		}
 		Command command = commands.get(cmd);
 		if(command != null){
-			try{
-				command.handle(event, self);
-			}
-			catch(Exception e){
-				e.printStackTrace();
-				event.getChannel().sendMessage("Oh no! Something went wrong while executing that command!\nThis incident has been reported.\n" + e).queue();
-				User owner = event.getJDA().getUserById("273216249021071360");
-				if(!(owner == null)){
-					owner.openPrivateChannel().queue(
-					(channel) ->{
-						String out = "```" + e.toString();
-						for(StackTraceElement trace : e.getStackTrace()){
-							out += "\n" + trace.toString();
-						}
-						if(out.length() > 1990){
-							out = out.substring(0, 1990) + "...";
-						}
-						channel.sendMessage(out + "```").queue((m) -> {},
-						(error) ->{
-							event.getChannel().sendMessage("Failed to report the incident!\n" + error).queue();
-						});
-						channel.sendMessage("Command: `" + event.getMessage().getContentRaw() + "`").queue((m) -> {}, (error) -> {});
-					});
+			executor.execute(() -> {
+				try{
+					command.handle(event, self);
 				}
-			}
-			return;
+				catch(Exception e){
+					e.printStackTrace();
+					event.getChannel().sendMessage("Oh no! Something went wrong while executing that command!\nThis incident has been reported.\n" + e).queue();
+					User owner = event.getJDA().getUserById("273216249021071360");
+					if(!(owner == null)){
+						owner.openPrivateChannel().queue(
+						(channel) ->{
+							String out = "```" + e.toString();
+							for(StackTraceElement trace : e.getStackTrace()){
+								out += "\n\tat " + trace.toString();
+							}
+							if(out.length() > 1990){
+								out = out.substring(0, 1990) + "...";
+							}
+							channel.sendMessage(out + "```").queue((m) -> {},
+							(error) ->{
+								event.getChannel().sendMessage("Failed to report the incident!\n" + error).queue();
+							});
+							channel.sendMessage("Command: `" + event.getMessage().getContentRaw() + "`").queue((m) -> {}, (error) -> {});
+						});
+					}
+				}
+			});
 		}
 	}
 }

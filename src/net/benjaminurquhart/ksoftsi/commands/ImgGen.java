@@ -51,6 +51,12 @@ public class ImgGen extends Command {
 	public void handle(GuildMessageReceivedEvent event, KSoftSi self) {
 		TextChannel channel = event.getChannel();
 		String[] args = event.getMessage().getContentRaw().split(" ", 4);
+		for(User user : event.getMessage().getMentionedUsers()) {
+			for(int i = 0; i < args.length; i++) {
+				args[i] = args[i].replace(event.getGuild().getMember(user).getAsMention(), user.getAsTag());
+				args[i] = args[i].replace(user.getAsMention(), user.getAsTag());
+			}
+		}
 		try{
 			String endpoint = args[2].toLowerCase();
 			if(!endpoints.contains(endpoint)){
