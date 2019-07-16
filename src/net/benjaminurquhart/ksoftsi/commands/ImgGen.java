@@ -83,7 +83,7 @@ public class ImgGen extends Command {
 			}
 			channel.sendTyping().queue();
 			text = text.replace(user1.getAsMention(), "").replace(user2.getAsMention(), "");
-			URLConnection conn = getConn(String.format(API, endpoint, URLEncoder.encode(text, "UTF-8").replace("%2C", ","), user1.getAvatarUrl(), user2.getAvatarUrl(), URLEncoder.encode(user1.getName(), "UTF-8"), URLEncoder.encode(user2.getName(), "UTF-8")), self.getImgenToken());
+			URLConnection conn = getConn(String.format(API, endpoint, URLEncoder.encode(text, "UTF-8").replace("%2C", ","), user1.getAvatarUrl().replaceFirst("\\.gif$", ".png"), user2.getAvatarUrl().replaceFirst("\\.gif$", ".png"), URLEncoder.encode(user1.getName(), "UTF-8"), URLEncoder.encode(user2.getName(), "UTF-8")), self.getImgenToken());
 			InputStream image = conn.getInputStream();
 			String extension = conn.getHeaderField("Content-Type");
 			extension = "." + extension.split(";")[0].split("/")[1];
