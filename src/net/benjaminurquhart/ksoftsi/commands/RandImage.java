@@ -8,6 +8,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.explodingbush.ksoftapi.KSoftAPI;
 import net.explodingbush.ksoftapi.entities.Reddit;
 import net.explodingbush.ksoftapi.enums.ImageType;
+import net.explodingbush.ksoftapi.exceptions.APIException;
 import net.explodingbush.ksoftapi.exceptions.NotFoundException;
 
 public class RandImage extends Command{
@@ -25,17 +26,29 @@ public class RandImage extends Command{
 			return;
 		}
 		try{
-			Reddit image;
-			do{
-				image = api.getRedditImage(ImageType.RANDOM_REDDIT).setSubreddit(args[2].toLowerCase()).execute();
-			}while(image.isNsfw() && !channel.isNSFW());
+			Reddit image = api.getRedditImage(ImageType.RANDOM_REDDIT)
+							  .setSubreddit(args[2].toLowerCase())
+							  .allowNSFW(channel.isNSFW())
+							  .execute();
+			if(!channel.isNSFW() && image.isNsfw()) {
+				channel.sendMessage("Unable to find a non-nsfw image from that subreddit.").queue();
+				return;
+			}
 			EmbedBuilder eb = EmbedUtils.getEmbed(event.getGuild(), image.getImageUrl(), image.getSubreddit(), event.getAuthor());
-			eb.setTitle(image.getTitle());
-			eb.setAuthor(image.getAuthor(), image.getSourceUrl());
+			eb.setTitle(image.getAuthor());
+			eb.setAuthor(image.getTitle(), image.getSourceUrl());
 			channel.sendMessage(eb.build()).queue();
 		}
 		catch(NotFoundException e){
 			channel.sendMessage("Unknown subreddit: " + args[2].toLowerCase()).queue();
+		}
+		catch(APIException e) {
+			if(e.getCause() instanceof NotFoundException) {
+				channel.sendMessage("Unknown subreddit: " + args[2].toLowerCase()).queue();
+			}
+			else {
+				throw e;
+			}
 		}
 	}
 	@Override

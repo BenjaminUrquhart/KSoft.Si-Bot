@@ -24,7 +24,7 @@ public class Lyrics extends Command {
 		KSoftAPI api = self.getAPI();
 		String[] args = event.getMessage().getContentRaw().toLowerCase().split(" ", 3);
 		if(args.length < 3){
-			channel.sendMessage(Usage.getUsage(this, "query"));
+			channel.sendMessage(Usage.getUsage(this, "query")).queue();
 			return;
 		}
 		List<Track> results;

@@ -29,6 +29,7 @@ public class Weather extends Command{
 		try{
 			channel.sendTyping().queue();
 			net.explodingbush.ksoftapi.entities.Weather data = api.getKumo().getWeatherAction().setLocationQuery(args[2]).setReportType(ReportType.CURRENTLY).setUnits(Units.AUTO).execute();
+			//System.out.println(data.getUnits());
 			EmbedBuilder eb = EmbedUtils.getEmbed(event.getGuild(), data.getIconUrl(), data.getLocation().getAddress(), event.getAuthor());
 			eb.setTimestamp(data.getTime().minusHours(5));
 			eb.setTitle(data.getSummary());
