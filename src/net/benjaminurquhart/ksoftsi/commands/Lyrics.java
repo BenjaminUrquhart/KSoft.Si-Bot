@@ -35,7 +35,7 @@ public class Lyrics extends Command {
 			}
 		}
 		catch(NotFoundException e){
-			channel.sendMessage("No results for query `" + args[2] + "`").queue();
+			channel.sendMessage("No results for query `" + args[2].replace("`", "") + "`").queue();
 			return;
 		}
 		catch(NullPointerException e) {
@@ -50,6 +50,7 @@ public class Lyrics extends Command {
 		}
 		EmbedBuilder eb = EmbedUtils.getEmbed(event.getGuild(), null, "Track ID: " + lyric.getId(), event.getAuthor());
 		eb.setDescription(text);
+		eb.setThumbnail(lyric.getAlbumArt());
 		eb.setTitle("\"" + lyric.getName() + "\" by " + lyric.getArtist().getName());
 		channel.sendMessage(eb.build()).queue();
 	}

@@ -39,11 +39,6 @@ public class KSoftSi {
 		return ksoftToken;
 	}
 	public String getImgenToken(){
-		/*
-		boolean calledByImgen = Arrays.asList(Thread.currentThread().getStackTrace()).stream().filter((t) -> t.toString().contains("ImgGen")).count() > 0;
-		if(!calledByImgen){
-			throw new SecurityException("Unauthorized");
-		}*/
 		return imgenToken;
 	}
 	public static void main(String[] args) throws Exception{
