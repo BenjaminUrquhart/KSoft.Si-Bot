@@ -1,5 +1,7 @@
 package net.benjaminurquhart.ksoftsi.commands;
 
+import org.json.JSONException;
+
 import net.benjaminurquhart.ksoftsi.KSoftSi;
 import net.benjaminurquhart.ksoftsi.util.EmbedUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -8,6 +10,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.explodingbush.ksoftapi.KSoftAPI;
 import net.explodingbush.ksoftapi.entities.Reddit;
 import net.explodingbush.ksoftapi.enums.ImageType;
+import net.explodingbush.ksoftapi.enums.Span;
 import net.explodingbush.ksoftapi.exceptions.APIException;
 import net.explodingbush.ksoftapi.exceptions.NotFoundException;
 
@@ -25,11 +28,13 @@ public class RandImage extends Command{
 			channel.sendMessage(this.getHelpMenu()).queue();
 			return;
 		}
+		Reddit image = null;
 		try{
-			Reddit image = api.getRedditImage(ImageType.RANDOM_REDDIT)
-							  .setSubreddit(args[2].toLowerCase())
-							  .allowNSFW(channel.isNSFW())
-							  .execute();
+			image = api.getRedditImage(ImageType.RANDOM_REDDIT)
+					   .setSubreddit(args[2].toLowerCase())
+					   .allowNSFW(channel.isNSFW())
+					   .setSpan(Span.ALL)
+					   .execute();
 			if(!channel.isNSFW() && image.isNsfw()) {
 				channel.sendMessage("Unable to find a non-nsfw image from that subreddit.").queue();
 				return;
@@ -49,6 +54,11 @@ public class RandImage extends Command{
 			else {
 				throw e;
 			}
+		}
+		catch(JSONException e) {
+			System.err.println(e);
+			System.err.println(image);
+			throw e;
 		}
 	}
 	@Override
