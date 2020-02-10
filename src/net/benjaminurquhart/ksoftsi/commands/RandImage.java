@@ -59,7 +59,7 @@ public class RandImage extends Command{
 			}
 		}
 		catch(IllegalArgumentException e) {
-			channel.sendMessage("Invalid input.\n" + this.getHelpMenu());
+			channel.sendMessage("Invalid input.\n" + this.getHelpMenu()).queue();
 		}
 		catch(JSONException e) {
 			channel.sendMessage("API returned invalid data, try again later").queue();
