@@ -51,14 +51,20 @@ public class RandImage extends Command{
 			if(e.getCause() instanceof NotFoundException) {
 				channel.sendMessage("Unknown subreddit: " + args[2].toLowerCase()).queue();
 			}
+			else if(e.getCause() instanceof JSONException) {
+				channel.sendMessage("API returned invalid data, try again later").queue();
+			}
 			else {
 				throw e;
 			}
 		}
+		catch(IllegalArgumentException e) {
+			channel.sendMessage("Invalid input.\n" + this.getHelpMenu());
+		}
 		catch(JSONException e) {
-			System.err.println(e);
-			System.err.println(image);
-			throw e;
+			channel.sendMessage("API returned invalid data, try again later").queue();
+			System.out.println(image);
+			e.printStackTrace();
 		}
 	}
 	@Override

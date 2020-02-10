@@ -82,8 +82,7 @@ public class CommandHandler extends ListenerAdapter{
 							(error) ->{
 								event.getChannel().sendMessage("Failed to report the incident!\n" + error).queue();
 							});
-							channel.sendMessage("Command: `" + event.getMessage().getContentRaw() + "`").queue((m) -> {}, (error) -> {});
-							channel.sendMessage("Guild: `" + event.getGuild() + "`\nUser: `" + event.getAuthor() + "`").queue((m) -> {}, (error) -> {});
+							channel.sendMessage("Command: `" + event.getMessage().getContentRaw() + "`\nGuild: `" + event.getGuild() + "`\nUser: `" + event.getAuthor() + "`").queue((m) -> {}, (error) -> {});
 						});
 					}
 				}
